@@ -62,10 +62,10 @@ public class ConsoleModel(AppDbContext db) : PageModel
             ]),
 
         new(2, "Compliance Dashboard",
-            @"CMS-0053-F requires all covered health plans to support electronic claim attachments using X12 275 — the structured, HIPAA-compliant attachment transaction. Large plans must comply by January 2027; all plans by January 2028. This is not optional. The penalty exposure is real, but more importantly, the payers who streamline provider experience will retain network relationships. This screen shows Meridian's current readiness score and the specific gaps we need to close. Let me walk through the gap assessment.",
+            @"CMS-0053-F requires all covered health plans to support electronic claim attachments using X12 275 — the structured, HIPAA-compliant attachment transaction. The final rule took effect May 26, 2026. All covered plans must comply by May 26, 2028. This is not optional and the clock is already running. The penalty exposure is real, but more importantly, the payers who streamline provider experience will retain network relationships. This screen shows Meridian's current readiness score and the specific gaps we need to close. Let me walk through the gap assessment.",
             [
-                ("Is the 2027 deadline final?",
-                 "The proposed rule has been published; the final rule is pending. We're building to the proposed requirements, and most plans are treating 2026 as their internal preparation deadline to avoid regulatory risk. Better to be early."),
+                ("Is the May 2028 deadline firm?",
+                 "Yes. The final rule is published and in effect as of May 26, 2026 — 45 CFR Part 162. The May 2028 compliance date is law, not a proposal. Most plans are targeting mid-2027 internally to leave buffer for trading partner enrollment and testing."),
                 ("What does '96% readiness' actually mean?",
                  "We mapped CMS-0053-F's eight specific technical requirements against this platform. Two areas — clearinghouse connectivity for all trading partners and full trading partner enrollment automation — are in scope for Phase 2. The 4% reflects those."),
                 ("What's the real penalty exposure for non-compliance?",

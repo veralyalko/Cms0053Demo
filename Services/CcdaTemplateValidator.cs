@@ -52,6 +52,10 @@ public class CcdaTemplateValidator
 
         var (templateName, required) = template;
 
+        // recordTarget is mandatory in every CDA R2 document — its absence is the Scenario B deliberate failure
+        if (root.Element(ns + "recordTarget") is null)
+            errors.Add("recordTarget element is missing — patient identity cannot be established for claim linkage");
+
         // Collect all section LOINC codes present in the document
         var presentSections = doc.Descendants(ns + "section")
             .Select(s => s.Element(ns + "code")?.Attribute("code")?.Value)

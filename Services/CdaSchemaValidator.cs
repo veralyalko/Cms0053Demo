@@ -46,13 +46,8 @@ public class CdaSchemaValidator
         var loincCode    = codeEl.Attribute("code")?.Value ?? "";
         var loincDisplay = codeEl.Attribute("displayName")?.Value ?? "";
 
-        // recordTarget > patientRole > patient
-        var patient = root.Element(ns + "recordTarget")
-                         ?.Element(ns + "patientRole")
-                         ?.Element(ns + "patient");
-        if (patient is null)
-            return Fail("Required path recordTarget/patientRole/patient is missing");
-
+        // recordTarget presence is a C-CDA template requirement, checked in Stage 3.
+        // Stage 2 extracts patient identity if present but does not fail on its absence.
         var patientId = root.Element(ns + "recordTarget")
                            ?.Element(ns + "patientRole")
                            ?.Element(ns + "id")

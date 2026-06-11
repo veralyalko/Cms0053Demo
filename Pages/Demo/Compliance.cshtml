@@ -75,11 +75,10 @@
                 @{
                     var milestones = new[]
                     {
-                        ("Dec 2023", "CMS proposes mandatory electronic claim attachments", "past", "Proposed rule published in Federal Register"),
-                        ("2024",     "Comment period — industry responds to proposal",       "past", "Payers and providers submit comments"),
-                        ("2026",     "Final rule effective — compliance preparation required","warn", "Health plans must begin implementation planning"),
-                        ("Jan 2027", "Large health plans: X12 275 support required",          "crit", "Non-compliance: HIPAA penalty exposure"),
-                        ("Jan 2028", "All covered plans: full compliance deadline",            "crit", "Mandatory for all plan sizes"),
+                        ("Dec 2023",    "CMS proposes mandatory electronic claim attachments",  "past", "Proposed rule published in Federal Register"),
+                        ("2024–2025",   "Final rule development and comment period",             "past", "Industry responds; CMS finalizes requirements"),
+                        ("May 26, 2026","Final rule effective — CMS-0053-F in force",           "warn", "Compliance preparation required for all covered health plans"),
+                        ("May 26, 2028","All covered plans: full X12 275 compliance required",  "crit", "Non-compliance: HIPAA civil money penalty exposure"),
                     };
                 }
                 @foreach (var (date, title, status, detail) in milestones)

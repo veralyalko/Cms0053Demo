@@ -4,7 +4,7 @@ namespace Cms0053Demo.Services;
 
 // Returns pre-built synthetic X12 275 envelopes and CDA R2 documents for each scenario.
 // All documents are structurally valid for real parsers.
-// Scenario B's "bad" CDA is missing the required Procedure Description section (10219-4)
+// Scenario B's "bad" CDA is missing the recordTarget element (patient identity block — required by CDA R2)
 // so it fails stage 3 (C-CDA template validation) exactly — stages 1 and 2 pass.
 public class SyntheticDocumentService
 {
@@ -151,9 +151,11 @@ IEA*1*000000003~";
   </component>
 </ClinicalDocument>";
 
-    // Scenario B — BAD: missing required Procedure Description section (10219-4).
+    // Scenario B — BAD: recordTarget element intentionally omitted per CMS-0053 spec.
     // Stage 1 (X12 parse) and Stage 2 (CDA schema) pass. Stage 3 (C-CDA template) fails.
+    // recordTarget is required by CDA R2; its absence identifies the patient — critical for claim linkage.
     private const string CDA_B_BAD = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+<!-- INTENTIONALLY INVALID — recordTarget omitted for deliberate failure demo -->
 <ClinicalDocument xmlns=""urn:hl7-org:v3"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <typeId root=""2.16.840.1.113883.1.3"" extension=""POCD_HD000040""/>
   <templateId root=""2.16.840.1.113883.10.20.22.1.1""/>
@@ -163,16 +165,7 @@ IEA*1*000000003~";
   <title>Operative Report — Sofia Reyes</title>
   <effectiveTime value=""20260610""/>
   <confidentialityCode code=""N"" codeSystem=""2.16.840.1.113883.5.25""/>
-  <recordTarget>
-    <patientRole>
-      <id extension=""MHP-B-000112"" root=""2.16.840.1.113883.19.5""/>
-      <patient>
-        <name><given>Sofia</given><family>Reyes</family></name>
-        <administrativeGenderCode code=""F"" codeSystem=""2.16.840.1.113883.5.1""/>
-        <birthTime value=""19910714""/>
-      </patient>
-    </patientRole>
-  </recordTarget>
+  <!-- recordTarget intentionally absent — triggers Stage 3 C-CDA template failure -->
   <author>
     <time value=""20260610""/>
     <assignedAuthor>
@@ -203,7 +196,14 @@ IEA*1*000000003~";
           <text>Elective cesarean section at 39 weeks gestation due to prior uterine surgery.</text>
         </section>
       </component>
-      <!-- NOTE: Procedure Description section (10219-4) intentionally absent — triggers Stage 3 failure -->
+      <component>
+        <section>
+          <templateId root=""2.16.840.1.113883.10.20.22.2.28""/>
+          <code code=""10219-4"" codeSystem=""2.16.840.1.113883.6.1"" displayName=""Procedure description""/>
+          <title>Procedure Description</title>
+          <text>Patient was brought to the operating suite and placed in dorsal supine position. Spinal anesthesia administered. Low transverse uterine incision performed. Male infant delivered in vertex presentation. Uterine incision closed in two layers. Estimated blood loss 450 mL.</text>
+        </section>
+      </component>
     </structuredBody>
   </component>
 </ClinicalDocument>";
