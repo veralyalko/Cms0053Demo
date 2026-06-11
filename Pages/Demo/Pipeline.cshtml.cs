@@ -27,7 +27,7 @@ public class PipelineModel(AppDbContext db, ValidationPipelineService pipeline) 
         if (scenarioId.HasValue)
         {
             var result = await pipeline.RunAsync(scenarioId.Value);
-            return RedirectToPage(new { transactionId = result.TransactionId });
+            return RedirectToPage("/Demo/TradingPartner", new { transactionId = result.TransactionId });
         }
 
         if (!transactionId.HasValue) return Page();
@@ -51,7 +51,7 @@ public class PipelineModel(AppDbContext db, ValidationPipelineService pipeline) 
     public async Task<IActionResult> OnPostResubmitAsync(int scenarioId)
     {
         var result = await pipeline.RunAsync(scenarioId, isResubmission: true);
-        return RedirectToPage(new { transactionId = result.TransactionId });
+        return RedirectToPage("/Demo/TradingPartner", new { transactionId = result.TransactionId });
     }
 
     public static string PrettyJson(string? json)

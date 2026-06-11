@@ -13,6 +13,19 @@
             <p class="text-muted small">iX DataBridge &bull; Powered by Onyx</p>
         </div>
 
+        @if (Model.TransactionCount > 0)
+        {
+            <div class="alert alert-secondary d-flex align-items-center gap-3 py-2 mb-4">
+                <span class="text-muted small flex-grow-1">
+                    <strong>@Model.TransactionCount</strong> transaction@(Model.TransactionCount != 1 ? "s" : "") from previous runs are in the database.
+                    Reset before a fresh presentation.
+                </span>
+                <form method="post" asp-page-handler="Reset" class="mb-0">
+                    <button type="submit" class="btn btn-sm btn-outline-secondary">Reset Demo</button>
+                </form>
+            </div>
+        }
+
         <h5 class="fw-semibold mb-3">Select Demo Scenario</h5>
         <div class="row g-3 mb-5">
             @foreach (var s in Model.Scenarios)
@@ -47,13 +60,36 @@
             }
         </div>
 
-        <h5 class="fw-semibold mb-3">Demo Screens</h5>
+        <h5 class="fw-semibold mb-2">Context Screens <span class="text-muted fw-normal small">(no scenario needed)</span></h5>
+        <div class="row g-2 mb-3">
+            @{
+                var staticScreens = new (string Url, string Num, string Title, string Desc, string Badge)[]
+                {
+                    ("/Demo/TodaysReality", "1", "Today's Reality",      "The before picture — manual, fax-based attachment chaos.",   "bg-danger"),
+                    ("/Demo/Compliance",    "2", "Compliance Dashboard", "CMS-0053-F mandate timeline and payer readiness gap.",       "bg-warning text-dark"),
+                };
+            }
+            @foreach (var s in staticScreens)
+            {
+                <div class="col-md-6">
+                    <a href="@s.Url" class="text-decoration-none">
+                        <div class="card card-body py-2 px-3 d-flex flex-row align-items-center gap-3">
+                            <span class="badge @s.Badge screen-badge" style="min-width:26px;text-align:center">@s.Num</span>
+                            <div>
+                                <div class="fw-semibold small">@s.Title</div>
+                                <div class="text-muted" style="font-size:.75rem">@s.Desc</div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            }
+        </div>
+
+        <h5 class="fw-semibold mb-2">Technical Screens <span class="text-muted fw-normal small">(run a scenario above to activate)</span></h5>
         <div class="row g-2 mb-4">
             @{
-                var screens = new (string Url, string Num, string Title, string Desc, string Badge)[]
+                var txScreens = new (string Url, string Num, string Title, string Desc, string Badge)[]
                 {
-                    ("/Demo/TodaysReality",  "1", "Today's Reality",         "The before picture — manual, fax-based attachment chaos.",        "bg-danger"),
-                    ("/Demo/Compliance",     "2", "Compliance Dashboard",    "CMS-0053-F mandate timeline and payer readiness gap.",            "bg-warning text-dark"),
                     ("/Demo/TradingPartner", "3", "Trading Partner Gateway", "Live X12 275 envelope receipt and segment-level parsing.",        "bg-primary"),
                     ("/Demo/Pipeline",       "4", "Validation Pipeline",     "8-stage real-time validation — the technical heart of the demo.", "bg-primary"),
                     ("/Demo/Repository",     "5", "Document Repository",     "LOINC-indexed attachment store with metadata panel.",             "bg-info text-dark"),
@@ -61,10 +97,10 @@
                     ("/Demo/AuditTrail",     "7", "Audit Trail",             "Cryptographic hash chain — tamper-evident, verifiable.",          "bg-success"),
                 };
             }
-            @foreach (var s in screens)
+            @foreach (var s in txScreens)
             {
                 <div class="col-md-6">
-                    <a asp-page="@s.Url" class="text-decoration-none">
+                    <a href="@s.Url" class="text-decoration-none">
                         <div class="card card-body py-2 px-3 d-flex flex-row align-items-center gap-3">
                             <span class="badge @s.Badge screen-badge" style="min-width:26px;text-align:center">@s.Num</span>
                             <div>
