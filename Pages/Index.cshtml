@@ -1,0 +1,84 @@
+@page
+@model Cms0053Demo.Pages.IndexModel
+@{
+    ViewData["Title"] = "CMS-0053 Demo — Meridian Health Plan";
+}
+
+<div class="row justify-content-center mt-4">
+    <div class="col-lg-9">
+
+        <div class="text-center mb-5">
+            <h1 class="display-5 fw-bold">From Provider to Payment in 12 Minutes</h1>
+            <p class="lead text-muted">Meridian Health Plan &mdash; CMS-0053-F Compliance Demo</p>
+            <p class="text-muted small">iX DataBridge &bull; Powered by Onyx</p>
+        </div>
+
+        <h5 class="fw-semibold mb-3">Select Demo Scenario</h5>
+        <div class="row g-3 mb-5">
+            @foreach (var s in Model.Scenarios)
+            {
+                var borderColor = s.Code switch { "A" => "border-success", "B" => "border-warning", _ => "border-primary" };
+                var badgeColor  = s.Code switch { "A" => "bg-success", "B" => "bg-warning text-dark", _ => "bg-primary" };
+                var typeLabel   = s.ScenarioType switch { "HappyPath" => "Happy Path", "DeliberateFailure" => "Failure + Recovery", _ => "UM Review" };
+                <div class="col-md-4">
+                    <div class="card h-100 @borderColor border-2">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <span class="fw-semibold">Scenario @s.Code</span>
+                            <span class="badge @badgeColor small">@typeLabel</span>
+                        </div>
+                        <div class="card-body">
+                            <h6 class="card-title">@s.Title</h6>
+                            <p class="card-text small text-muted">@s.Description</p>
+                            <ul class="list-unstyled small mb-0">
+                                <li><span class="text-muted">Patient:</span> @s.PatientName</li>
+                                <li><span class="text-muted">Provider:</span> @s.ProviderName</li>
+                                <li><span class="text-muted">Claim:</span> @s.ClaimNumber (@s.ClaimAmount.ToString("C0"))</li>
+                                <li><span class="text-muted">Document:</span> @s.DocumentType &mdash; <span class="font-monospace">@s.LoincCode</span></li>
+                            </ul>
+                        </div>
+                        <div class="card-footer">
+                            <form method="post">
+                                <input type="hidden" name="scenarioId" value="@s.Id" />
+                                <button type="submit" class="btn btn-sm btn-outline-primary w-100">Run Scenario @s.Code &rarr;</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <h5 class="fw-semibold mb-3">Demo Screens</h5>
+        <div class="row g-2 mb-4">
+            @{
+                var screens = new (string Url, string Num, string Title, string Desc, string Badge)[]
+                {
+                    ("/Demo/TodaysReality",  "1", "Today's Reality",         "The before picture — manual, fax-based attachment chaos.",        "bg-danger"),
+                    ("/Demo/Compliance",     "2", "Compliance Dashboard",    "CMS-0053-F mandate timeline and payer readiness gap.",            "bg-warning text-dark"),
+                    ("/Demo/TradingPartner", "3", "Trading Partner Gateway", "Live X12 275 envelope receipt and segment-level parsing.",        "bg-primary"),
+                    ("/Demo/Pipeline",       "4", "Validation Pipeline",     "8-stage real-time validation — the technical heart of the demo.", "bg-primary"),
+                    ("/Demo/Repository",     "5", "Document Repository",     "LOINC-indexed attachment store with metadata panel.",             "bg-info text-dark"),
+                    ("/Demo/ClaimsHandoff",  "6", "Claims + UM Handoff",     "Cycle-time timeline and routing to adjudication or UM review.",   "bg-success"),
+                    ("/Demo/AuditTrail",     "7", "Audit Trail",             "Cryptographic hash chain — tamper-evident, verifiable.",          "bg-success"),
+                };
+            }
+            @foreach (var s in screens)
+            {
+                <div class="col-md-6">
+                    <a asp-page="@s.Url" class="text-decoration-none">
+                        <div class="card card-body py-2 px-3 d-flex flex-row align-items-center gap-3">
+                            <span class="badge @s.Badge screen-badge" style="min-width:26px;text-align:center">@s.Num</span>
+                            <div>
+                                <div class="fw-semibold small">@s.Title</div>
+                                <div class="text-muted" style="font-size:.75rem">@s.Desc</div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            }
+        </div>
+
+        <div class="text-center">
+            <a asp-page="/Presenter/Console" class="btn btn-outline-warning">Open Presenter Console</a>
+        </div>
+    </div>
+</div>
