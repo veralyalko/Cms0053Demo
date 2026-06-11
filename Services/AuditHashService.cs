@@ -11,7 +11,9 @@ public class AuditHashService
 
     public string ComputeHash(string previousHash, string eventType, string description, DateTime occurredAt)
     {
-        var data = $"{previousHash}|{eventType}|{description}|{occurredAt:O}";
+        // SQLite round-trips DateTime as Unspecified kind; "O" includes the kind suffix (Z vs nothing).
+        // Normalizing to Utc ensures write-time and read-time produce identical strings.
+        var data = $"{previousHash}|{eventType}|{description}|{DateTime.SpecifyKind(occurredAt, DateTimeKind.Utc):O}";
         var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(data));
         return Convert.ToHexString(bytes).ToLower();
     }
