@@ -1,7 +1,21 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+
+## SQLite
 *.db
 *.db-shm
 *.db-wal
-bin/
-obj/
+
+## IDE
+.vs/
+.idea/
+
+## macOS
 .DS_Store
+
+## Uploads / generated output
 wwwroot/uploads/
+publish/
