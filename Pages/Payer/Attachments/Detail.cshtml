@@ -1,0 +1,178 @@
+@page "/Payer/Attachments/Detail/{id:int}"
+@model Cms0053Demo.Pages.Payer.Attachments.DetailModel
+@using System.Text.Json
+@{ ViewData["Title"] = "Attachment Detail"; var tx = Model.Transaction!; }
+
+<div class="d-flex align-items-center gap-2 mb-1">
+    <span class="badge bg-primary">Payer Portal</span>
+    <a href="/Payer/Dashboard" class="text-muted small text-decoration-none">← Dashboard</a>
+</div>
+<div class="d-flex justify-content-between align-items-start mb-3">
+    <div>
+        <h2 class="fw-bold mb-0">Attachment Detail</h2>
+        <p class="font-monospace text-muted mb-0 small">@tx.TrackingNumber</p>
+    </div>
+    @{
+        var badgeClass = tx.Status == "Routed" ? "bg-success" : tx.Status == "Failed" ? "bg-danger" : "bg-secondary";
+        var sourceLabel = tx.SourceType switch { "Solicited" => "Solicited", "UnsolicitedClearinghouse" => "Clearinghouse", _ => "Direct" };
+    }
+    <div class="text-end">
+        <span class="badge @badgeClass fs-6">@tx.Status</span><br/>
+        <span class="badge bg-secondary small mt-1">@sourceLabel</span>
+    </div>
+</div>
+
+@* ── Submission metadata ── *@
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-header py-2"><strong>Patient</strong></div>
+            <div class="card-body small">
+                <div class="fw-semibold">@tx.PatientName</div>
+                <div class="text-muted">DOB: @tx.PatientDOB.ToString("MM/dd/yyyy")</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-header py-2"><strong>Provider</strong></div>
+            <div class="card-body small">
+                <div class="fw-semibold">@tx.ProviderName</div>
+                <div class="text-muted">NPI: @tx.ProviderNPI</div>
+                <div class="text-muted">Service: @tx.ServiceDate.ToString("MM/dd/yyyy")</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-header py-2"><strong>Document</strong></div>
+            <div class="card-body small">
+                <div class="fw-semibold">@tx.DocumentType</div>
+                <div class="font-monospace text-muted">@tx.LoincCode</div>
+                @if (!string.IsNullOrEmpty(tx.OriginalFileName))
+                {
+                    <div class="text-muted">@tx.OriginalFileName (@((tx.FileSizeBytes / 1024.0).ToString("N1")) KB)</div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (tx.Claim is not null)
+{
+    <div class="alert alert-success py-2 mb-4">
+        <strong>Matched Claim:</strong> @tx.Claim.ClaimNumber — @tx.Claim.PatientName — @tx.Claim.AmountBilled.ToString("C0")
+        &nbsp;<span class="badge bg-success">@tx.Claim.DiagnosisCode</span>
+    </div>
+}
+
+@* ── Validation Pipeline ── *@
+<h5 class="fw-semibold mb-2">Validation Pipeline</h5>
+<div class="card mb-4">
+    <div class="card-body p-0">
+        <div class="list-group list-group-flush" id="stageList">
+            @foreach (var s in Model.Stages)
+            {
+                var icon  = s.Passed ? "✓" : "✗";
+                var color = s.Passed ? "text-success" : "text-danger";
+                var bg    = s.Passed ? "" : "bg-danger bg-opacity-10";
+                <div class="list-group-item @bg" style="cursor:pointer"
+                     data-bs-toggle="collapse" data-bs-target="#stage-@s.Id">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="@color fw-bold">@icon</span>
+                            <span class="badge bg-secondary">@s.StageOrder</span>
+                            <span class="fw-semibold small">@s.StageName</span>
+                        </div>
+                        <span class="text-muted small">@s.DurationMs ms</span>
+                    </div>
+                    @if (!s.Passed && !string.IsNullOrEmpty(s.Detail))
+                    {
+                        @try {
+                            var d = JsonDocument.Parse(s.Detail);
+                            var errs = d.RootElement.TryGetProperty("Errors", out var e) ? e.ToString() : "";
+                            if (!string.IsNullOrEmpty(errs) && errs != "[]")
+                            {
+                                <div class="text-danger small mt-1">@errs</div>
+                            }
+                        } catch { }
+                    }
+                </div>
+                <div id="stage-@s.Id" class="collapse">
+                    <div class="list-group-item bg-light">
+                        <pre class="mb-0 small" style="white-space:pre-wrap;word-break:break-all">@(
+                            string.IsNullOrEmpty(s.Detail) ? "(no detail)" :
+                            JsonSerializer.Serialize(JsonSerializer.Deserialize<object>(s.Detail),
+                                new JsonSerializerOptions { WriteIndented = true })
+                        )</pre>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@* ── X12 Envelope ── *@
+<h5 class="fw-semibold mb-2">X12 275 Envelope</h5>
+<div class="card mb-4">
+    <div class="card-body">
+        <pre class="mb-0 small font-monospace" style="white-space:pre-wrap">@foreach (var seg in tx.X12Envelope.Split('~', StringSplitOptions.RemoveEmptyEntries))
+        {<span class="d-block">@seg.Trim()~</span>}</pre>
+    </div>
+</div>
+
+@* ── CDA Document (collapsed) ── *@
+<h5 class="fw-semibold mb-2">CDA Document</h5>
+<div class="card mb-4">
+    <div class="card-header py-2 d-flex justify-content-between">
+        <span class="small text-muted">C-CDA R2.1 — signed with XMLDSig</span>
+        <button class="btn btn-sm btn-link py-0" data-bs-toggle="collapse" data-bs-target="#cdaDoc">
+            Show / Hide
+        </button>
+    </div>
+    <div id="cdaDoc" class="collapse">
+        <div class="card-body">
+            <pre class="mb-0 small" style="white-space:pre-wrap;max-height:400px;overflow:auto">@tx.CdaDocument</pre>
+        </div>
+    </div>
+</div>
+
+@* ── Audit Trail ── *@
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <h5 class="fw-semibold mb-0">Cryptographic Audit Trail</h5>
+    @if (Model.ChainValid)
+    {
+        <span class="badge bg-success">✓ Chain Intact</span>
+    }
+    else
+    {
+        <span class="badge bg-danger">✗ Chain Broken</span>
+    }
+</div>
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table table-sm table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th class="small">Event</th>
+                    <th class="small">Description</th>
+                    <th class="small">Timestamp</th>
+                    <th class="small">Hash</th>
+                    <th class="small">Prev Hash</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var ev in Model.AuditEvents)
+                {
+                    <tr>
+                        <td class="small font-monospace">@ev.EventType</td>
+                        <td class="small">@ev.Description</td>
+                        <td class="small text-muted">@ev.OccurredAt.ToString("HH:mm:ss.fff")</td>
+                        <td class="font-monospace small text-success" title="@ev.EventHash">@DetailModel.HashAbbrev(ev.EventHash)</td>
+                        <td class="font-monospace small text-muted" title="@ev.PreviousHash">@DetailModel.HashAbbrev(ev.PreviousHash)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

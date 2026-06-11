@@ -1,0 +1,103 @@
+@page
+@model Cms0053Demo.Pages.Payer.Requests.CreateModel
+@{ ViewData["Title"] = "Create Attachment Request"; }
+
+<div class="d-flex align-items-center gap-2 mb-1">
+    <span class="badge bg-primary">Payer Portal</span>
+    <span class="text-muted small">/ Solicited Workflow</span>
+</div>
+<h2 class="fw-bold mb-1">Create Attachment Request</h2>
+<p class="text-muted mb-4">
+    Request clinical documentation from a provider for a specific claim.
+    Generates a secure upload link for the provider.
+    <span class="badge bg-light text-secondary border small ms-1">X12 277 proxy</span>
+</p>
+
+<div class="row">
+    <div class="col-lg-7">
+        <form method="post">
+            <div class="card mb-3">
+                <div class="card-header py-2"><strong>1. Select Claim</strong></div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Claim</label>
+                        <select name="ClaimId" class="form-select" required>
+                            <option value="">-- Select an open claim --</option>
+                            @foreach (var claim in Model.OpenClaims)
+                            {
+                                <option value="@claim.Id">
+                                    @claim.ClaimNumber — @claim.PatientName — @claim.ProviderName (@claim.AmountBilled.ToString("C0"))
+                                </option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header py-2"><strong>2. Document Request Details</strong></div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Document Type Requested</label>
+                        <select name="DocumentTypeRequested" class="form-select" required>
+                            <option value="">-- Select document type --</option>
+                            <option value="Discharge Summary">Discharge Summary</option>
+                            <option value="Operative Note">Operative Note</option>
+                            <option value="History and Physical Note">History and Physical Note</option>
+                            <option value="Lab Results">Lab Results</option>
+                            <option value="Radiology Report">Radiology Report</option>
+                            <option value="Office Visit Notes">Office Visit Notes</option>
+                            <option value="Prior Authorization Documentation">Prior Authorization Documentation</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Request Reason</label>
+                        <textarea name="RequestReason" class="form-control" rows="2"
+                                  placeholder="e.g. Medical necessity review required for inpatient admission"></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Provider Email</label>
+                            <input name="ProviderEmail" type="email" class="form-control"
+                                   placeholder="provider@example.com" />
+                            <div class="form-text">Where the secure upload link will be sent.</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Response Due (days)</label>
+                            <input name="DueDays" type="number" class="form-control" value="14" min="1" max="90" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger">Please correct the errors above.</div>
+            }
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Send Request &rarr;</button>
+                <a href="/Payer/Requests/Index" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+    <div class="col-lg-5">
+        <div class="card border-light">
+            <div class="card-header py-2 bg-light"><strong>What happens next</strong></div>
+            <div class="card-body small text-muted">
+                <ol class="ps-3 mb-0">
+                    <li class="mb-1">A secure upload link is generated and emailed to the provider.</li>
+                    <li class="mb-1">The provider opens the link, reviews the request, and uploads the requested C-CDA document.</li>
+                    <li class="mb-1">The document runs through the 8-stage validation pipeline automatically.</li>
+                    <li>Results appear in the Payer Dashboard with full audit trail.</li>
+                </ol>
+            </div>
+        </div>
+        <div class="card mt-3 border-light">
+            <div class="card-header py-2 bg-light"><strong>X12 277 Proxy</strong></div>
+            <div class="card-body small text-muted">
+                In production, this form generates an X12 277 Additional Information Request transaction transmitted to the provider's clearinghouse over SFTP or AS2. The secure upload link simulates the provider-facing acknowledgement.
+            </div>
+        </div>
+    </div>
+</div>

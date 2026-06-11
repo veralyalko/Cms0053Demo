@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Synthea-generated CDA R2 / C-CDA R2.1 Discharge Summary -->
+<!-- Patient: Patricia Williams | Valley General Hospital | NPI: 4441234567 -->
+<ClinicalDocument xmlns="urn:hl7-org:v3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <typeId root="2.16.840.1.113883.1.3" extension="POCD_HD000040"/>
+  <templateId root="2.16.840.1.113883.10.20.22.1.1"/>
+  <templateId root="2.16.840.1.113883.10.20.22.1.8"/>
+  <id root="2.16.840.1.113883.19" extension="CLM-D-2026-0155-CDA"/>
+  <code code="18842-5" codeSystem="2.16.840.1.113883.6.1" displayName="Discharge Summary"/>
+  <title>Discharge Summary — Patricia Williams</title>
+  <effectiveTime value="20260428"/>
+  <confidentialityCode code="N" codeSystem="2.16.840.1.113883.5.25"/>
+  <recordTarget>
+    <patientRole>
+      <id root="2.16.840.1.113883.19" extension="MHP-D-000155"/>
+      <addr use="HP">
+        <streetAddressLine>52 Elm Court Apt 4B</streetAddressLine>
+        <city>Canton</city>
+        <state>OH</state>
+        <postalCode>44702</postalCode>
+      </addr>
+      <telecom use="HP" value="tel:+13305550492"/>
+      <patient>
+        <name use="L">
+          <given>Patricia</given>
+          <family>Williams</family>
+        </name>
+        <administrativeGenderCode code="F" codeSystem="2.16.840.1.113883.5.1"/>
+        <birthTime value="19450930"/>
+        <raceCode code="2106-3" codeSystem="2.16.840.1.113883.6.238" displayName="White"/>
+        <ethnicGroupCode code="2186-5" codeSystem="2.16.840.1.113883.6.238" displayName="Not Hispanic or Latino"/>
+      </patient>
+    </patientRole>
+  </recordTarget>
+  <author>
+    <time value="20260428"/>
+    <assignedAuthor>
+      <id root="2.16.840.1.113883.4.6" extension="4441234567"/>
+      <assignedPerson>
+        <name>
+          <prefix>Dr.</prefix>
+          <given>Angela</given>
+          <family>Torres</family>
+          <suffix>MD</suffix>
+        </name>
+      </assignedPerson>
+      <representedOrganization>
+        <name>Valley General Hospital</name>
+      </representedOrganization>
+    </assignedAuthor>
+  </author>
+  <custodian>
+    <assignedCustodian>
+      <representedCustodianOrganization>
+        <id root="2.16.840.1.113883.4.6" extension="4441234567"/>
+        <name>Valley General Hospital</name>
+        <telecom use="WP" value="tel:+13305550400"/>
+        <addr>
+          <streetAddressLine>1900 Valley View Drive</streetAddressLine>
+          <city>Canton</city>
+          <state>OH</state>
+          <postalCode>44702</postalCode>
+        </addr>
+      </representedCustodianOrganization>
+    </assignedCustodian>
+  </custodian>
+  <component>
+    <structuredBody>
+      <!-- Chief Complaint (LOINC 10154-3) -->
+      <component>
+        <section>
+          <templateId root="2.16.840.1.113883.10.20.22.2.13"/>
+          <code code="10154-3" codeSystem="2.16.840.1.113883.6.1" displayName="Chief Complaint"/>
+          <title>Chief Complaint</title>
+          <text>80-year-old female presenting with 3-day history of fever (103.2°F), productive cough with yellow-green sputum, progressive shortness of breath, and decreased oxygen saturation to 88% on room air at home. Accompanied by daughter who reports decreased oral intake and increased confusion over the past 24 hours.</text>
+        </section>
+      </component>
+      <!-- Hospital Course (LOINC 8648-8) -->
+      <component>
+        <section>
+          <templateId root="2.16.840.1.113883.10.20.22.2.24"/>
+          <code code="8648-8" codeSystem="2.16.840.1.113883.6.1" displayName="Hospital Course"/>
+          <title>Hospital Course</title>
+          <text>Patient admitted to the medical floor on supplemental oxygen. Chest X-ray revealed left lower lobe infiltrate consistent with pneumonia. Blood cultures and sputum cultures obtained. Initiated on IV ceftriaxone and azithromycin per community-acquired pneumonia protocol. Urine Legionella and pneumococcal antigens negative. Blood cultures showed no growth at 5 days. Sputum culture grew Streptococcus pneumoniae, pan-sensitive. Delirium evaluation performed; likely secondary to infection. Patient improved clinically over 4 days with resolution of fever and improvement in oxygenation to 95% on room air. Transitioned to oral amoxicillin-clavulanate for discharge. Geriatrics consulted; recommended outpatient cognitive evaluation.</text>
+        </section>
+      </component>
+      <!-- Discharge Diagnoses (LOINC 11535-2) -->
+      <component>
+        <section>
+          <templateId root="2.16.840.1.113883.10.20.22.2.24"/>
+          <code code="11535-2" codeSystem="2.16.840.1.113883.6.1" displayName="Discharge Diagnoses"/>
+          <title>Discharge Diagnoses</title>
+          <text>
+            1. Community-acquired pneumonia, left lower lobe — Streptococcus pneumoniae (J18.9) — primary
+            2. Acute hypoxic respiratory failure (J96.01)
+            3. Delirium, secondary to infection (F05)
+            4. Chronic atrial fibrillation (I48.20)
+            5. Heart failure with preserved ejection fraction (I50.30)
+          </text>
+        </section>
+      </component>
+      <!-- Discharge Medications (LOINC 75310-3) -->
+      <component>
+        <section>
+          <templateId root="2.16.840.1.113883.10.20.22.2.11.1"/>
+          <code code="75310-3" codeSystem="2.16.840.1.113883.6.1" displayName="Discharge Medications"/>
+          <title>Discharge Medications</title>
+          <text>
+            NEW:
+            1. Amoxicillin-clavulanate 875/125 mg twice daily x 5 days (to complete 7-day course)
+            CONTINUED:
+            2. Apixaban 5 mg twice daily (dose-reduced to 2.5 mg twice daily per age/weight criteria)
+            3. Metoprolol succinate 25 mg daily
+            4. Furosemide 20 mg daily
+            5. Lisinopril 5 mg daily (held while creatinine elevated — recheck in 5 days)
+          </text>
+        </section>
+      </component>
+    </structuredBody>
+  </component>
+</ClinicalDocument>

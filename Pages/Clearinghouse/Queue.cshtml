@@ -1,0 +1,121 @@
+@page
+@model Cms0053Demo.Pages.Clearinghouse.QueueModel
+@{ ViewData["Title"] = "Clearinghouse Queue"; }
+
+<div class="d-flex align-items-center gap-2 mb-1">
+    <span class="badge bg-primary">Payer Portal</span>
+    <span class="badge bg-info text-dark">Clearinghouse</span>
+    <span class="text-muted small">Veridian Health Exchange</span>
+</div>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold mb-0">Clearinghouse Pull Queue</h2>
+    @if (Model.NewRecords.Any())
+    {
+        <form method="post" asp-page-handler="PullAll">
+            <button type="submit" class="btn btn-primary">
+                Pull All (@Model.NewRecords.Count) &amp; Process &rarr;
+            </button>
+        </form>
+    }
+</div>
+
+@if (!string.IsNullOrEmpty(Model.SuccessMessage))
+{
+    <div class="alert alert-success">@Model.SuccessMessage — now pending in the queue below.</div>
+}
+@if (TempData.ContainsKey("Error"))
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<h5 class="fw-semibold mb-2">
+    Pending <span class="badge bg-warning text-dark">@Model.NewRecords.Count</span>
+</h5>
+
+@if (!Model.NewRecords.Any())
+{
+    <div class="card mb-4">
+        <div class="card-body text-center text-muted py-4">
+            No new records in the clearinghouse queue.
+            <a href="/Clearinghouse/Submit" class="ms-2">Submit one from the provider portal</a>.
+        </div>
+    </div>
+}
+else
+{
+    <div class="table-responsive mb-4">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Tracking #</th>
+                    <th>Provider</th>
+                    <th>Patient</th>
+                    <th>Document</th>
+                    <th>Claim</th>
+                    <th>Submitted</th>
+                    <th>File</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var r in Model.NewRecords)
+                {
+                    <tr>
+                        <td class="font-monospace small text-muted">@r.TrackingNumber</td>
+                        <td class="small">@r.ProviderName<br/><span class="text-muted">@r.ProviderNPI</span></td>
+                        <td class="small">@r.PatientName<br/><span class="text-muted">@r.PatientDOB.ToString("MM/dd/yyyy")</span></td>
+                        <td class="small">@r.DocumentType<br/><span class="font-monospace text-muted" style="font-size:.7rem">@r.LoincCode</span></td>
+                        <td class="small fw-semibold">@r.ClaimNumber</td>
+                        <td class="small text-muted">@r.SubmittedAt.ToString("MM/dd HH:mm")</td>
+                        <td class="small text-muted">@r.OriginalFileName<br/>@((r.FileSizeBytes/1024.0).ToString("N1")) KB</td>
+                        <td>
+                            <form method="post" asp-page-handler="Pull">
+                                <input type="hidden" name="recordId" value="@r.Id" />
+                                <button type="submit" class="btn btn-sm btn-outline-primary">Pull &amp; Process</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@if (Model.PulledRecords.Any())
+{
+    <h5 class="fw-semibold mb-2">Recently Pulled</h5>
+    <div class="table-responsive">
+        <table class="table table-sm table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>Tracking #</th>
+                    <th>Provider</th>
+                    <th>Patient</th>
+                    <th>Document</th>
+                    <th>Pulled</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var r in Model.PulledRecords)
+                {
+                    var tx = r.Transactions.FirstOrDefault();
+                    <tr>
+                        <td class="font-monospace small text-muted">@r.TrackingNumber</td>
+                        <td class="small">@r.ProviderName</td>
+                        <td class="small">@r.PatientName</td>
+                        <td class="small">@r.DocumentType</td>
+                        <td class="small text-muted">@r.PulledAt?.ToString("MM/dd HH:mm")</td>
+                        <td>
+                            @if (tx is not null)
+                            {
+                                <a href="/Payer/Attachments/Detail/@tx.Id"
+                                   class="btn btn-sm btn-outline-secondary py-0 px-2">View Result</a>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

@@ -5,18 +5,38 @@ namespace Cms0053Demo.Data;
 
 public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
-    public DbSet<DemoScenario> DemoScenarios => Set<DemoScenario>();
+    public DbSet<Claim> Claims => Set<Claim>();
+    public DbSet<AttachmentRequest> AttachmentRequests => Set<AttachmentRequest>();
+    public DbSet<ClearinghouseRecord> ClearinghouseRecords => Set<ClearinghouseRecord>();
+    public DbSet<EmrDocument> EmrDocuments => Set<EmrDocument>();
     public DbSet<AttachmentTransaction> AttachmentTransactions => Set<AttachmentTransaction>();
     public DbSet<ValidationStageResult> ValidationStageResults => Set<ValidationStageResult>();
     public DbSet<AuditEvent> AuditEvents => Set<AuditEvent>();
-    public DbSet<PresenterSession> PresenterSessions => Set<PresenterSession>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<AttachmentRequest>()
+            .HasOne(r => r.Claim)
+            .WithMany(c => c.AttachmentRequests)
+            .HasForeignKey(r => r.ClaimId);
+
         modelBuilder.Entity<AttachmentTransaction>()
-            .HasOne(t => t.Scenario)
-            .WithMany(s => s.Transactions)
-            .HasForeignKey(t => t.ScenarioId);
+            .HasOne(t => t.Claim)
+            .WithMany(c => c.Attachments)
+            .HasForeignKey(t => t.ClaimId)
+            .IsRequired(false);
+
+        modelBuilder.Entity<AttachmentTransaction>()
+            .HasOne(t => t.AttachmentRequest)
+            .WithMany(r => r.Transactions)
+            .HasForeignKey(t => t.AttachmentRequestId)
+            .IsRequired(false);
+
+        modelBuilder.Entity<AttachmentTransaction>()
+            .HasOne(t => t.ClearinghouseRecord)
+            .WithMany(c => c.Transactions)
+            .HasForeignKey(t => t.ClearinghouseRecordId)
+            .IsRequired(false);
 
         modelBuilder.Entity<ValidationStageResult>()
             .HasOne(r => r.Transaction)

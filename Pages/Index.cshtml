@@ -1,120 +1,148 @@
 @page
 @model Cms0053Demo.Pages.IndexModel
-@{
-    ViewData["Title"] = "CMS-0053 Demo — Meridian Health Plan";
-}
+@{ ViewData["Title"] = "CMS-0053 Attachment Platform"; }
 
-<div class="row justify-content-center mt-4">
-    <div class="col-lg-9">
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold mb-0">CMS-0053 Claim Attachment Platform</h2>
+        <p class="text-muted mb-0">Meridian Health Plan &mdash; iXDataBridge</p>
+    </div>
+    @if (Model.TotalTransactionsCount > 0)
+    {
+        <form method="post" asp-page-handler="Reset">
+            <button type="submit" class="btn btn-sm btn-outline-secondary"
+                    onclick="return confirm('Reset all transactions, requests, and clearinghouse records?')">
+                Reset Demo Data
+            </button>
+        </form>
+    }
+</div>
 
-        <div class="text-center mb-5">
-            <h1 class="display-5 fw-bold">From Provider to Payment in 12 Minutes</h1>
-            <p class="lead text-muted">Meridian Health Plan &mdash; CMS-0053-F Compliance Demo</p>
-            <p class="text-muted small">iX DataBridge &bull; Powered by Onyx</p>
-        </div>
-
-        @if (Model.TransactionCount > 0)
-        {
-            <div class="alert alert-secondary d-flex align-items-center gap-3 py-2 mb-4">
-                <span class="text-muted small flex-grow-1">
-                    <strong>@Model.TransactionCount</strong> transaction@(Model.TransactionCount != 1 ? "s" : "") from previous runs are in the database.
-                    Reset before a fresh presentation.
-                </span>
-                <form method="post" asp-page-handler="Reset" class="mb-0">
-                    <button type="submit" class="btn btn-sm btn-outline-secondary">Reset Demo</button>
-                </form>
+@* ── Summary stats ── *@
+<div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+        <div class="card border-primary h-100">
+            <div class="card-body text-center">
+                <div class="display-6 fw-bold text-primary">@Model.OpenClaimsCount</div>
+                <div class="small text-muted mt-1">Open Claims</div>
             </div>
-        }
-
-        <h5 class="fw-semibold mb-3">Select Demo Scenario</h5>
-        <div class="row g-3 mb-5">
-            @foreach (var s in Model.Scenarios)
-            {
-                var borderColor = s.Code switch { "A" => "border-success", "B" => "border-warning", _ => "border-primary" };
-                var badgeColor  = s.Code switch { "A" => "bg-success", "B" => "bg-warning text-dark", _ => "bg-primary" };
-                var typeLabel   = s.ScenarioType switch { "HappyPath" => "Happy Path", "DeliberateFailure" => "Failure + Recovery", _ => "UM Review" };
-                <div class="col-md-4">
-                    <div class="card h-100 @borderColor border-2">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <span class="fw-semibold">Scenario @s.Code</span>
-                            <span class="badge @badgeColor small">@typeLabel</span>
-                        </div>
-                        <div class="card-body">
-                            <h6 class="card-title">@s.Title</h6>
-                            <p class="card-text small text-muted">@s.Description</p>
-                            <ul class="list-unstyled small mb-0">
-                                <li><span class="text-muted">Patient:</span> @s.PatientName</li>
-                                <li><span class="text-muted">Provider:</span> @s.ProviderName</li>
-                                <li><span class="text-muted">Claim:</span> @s.ClaimNumber (@s.ClaimAmount.ToString("C0"))</li>
-                                <li><span class="text-muted">Document:</span> @s.DocumentType &mdash; <span class="font-monospace">@s.LoincCode</span></li>
-                            </ul>
-                        </div>
-                        <div class="card-footer">
-                            <form method="post">
-                                <input type="hidden" name="scenarioId" value="@s.Id" />
-                                <button type="submit" class="btn btn-sm btn-outline-primary w-100">Run Scenario @s.Code &rarr;</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            }
         </div>
-
-        <h5 class="fw-semibold mb-2">Context Screens <span class="text-muted fw-normal small">(no scenario needed)</span></h5>
-        <div class="row g-2 mb-3">
-            @{
-                var staticScreens = new (string Url, string Num, string Title, string Desc, string Badge)[]
-                {
-                    ("/Demo/TodaysReality", "1", "Today's Reality",      "The before picture — manual, fax-based attachment chaos.",   "bg-danger"),
-                    ("/Demo/Compliance",    "2", "Compliance Dashboard", "CMS-0053-F mandate timeline and payer readiness gap.",       "bg-warning text-dark"),
-                };
-            }
-            @foreach (var s in staticScreens)
-            {
-                <div class="col-md-6">
-                    <a href="@s.Url" class="text-decoration-none">
-                        <div class="card card-body py-2 px-3 d-flex flex-row align-items-center gap-3">
-                            <span class="badge @s.Badge screen-badge" style="min-width:26px;text-align:center">@s.Num</span>
-                            <div>
-                                <div class="fw-semibold small">@s.Title</div>
-                                <div class="text-muted" style="font-size:.75rem">@s.Desc</div>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-            }
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card border-warning h-100">
+            <div class="card-body text-center">
+                <div class="display-6 fw-bold text-warning">@Model.PendingRequestsCount</div>
+                <div class="small text-muted mt-1">Pending Requests</div>
+            </div>
         </div>
-
-        <h5 class="fw-semibold mb-2">Technical Screens <span class="text-muted fw-normal small">(run a scenario above to activate)</span></h5>
-        <div class="row g-2 mb-4">
-            @{
-                var txScreens = new (string Url, string Num, string Title, string Desc, string Badge)[]
-                {
-                    ("/Demo/TradingPartner", "3", "Trading Partner Gateway", "Live X12 275 envelope receipt and segment-level parsing.",        "bg-primary"),
-                    ("/Demo/Pipeline",       "4", "Validation Pipeline",     "8-stage real-time validation — the technical heart of the demo.", "bg-primary"),
-                    ("/Demo/Repository",     "5", "Document Repository",     "LOINC-indexed attachment store with metadata panel.",             "bg-info text-dark"),
-                    ("/Demo/ClaimsHandoff",  "6", "Claims + UM Handoff",     "Cycle-time timeline and routing to adjudication or UM review.",   "bg-success"),
-                    ("/Demo/AuditTrail",     "7", "Audit Trail",             "Cryptographic hash chain — tamper-evident, verifiable.",          "bg-success"),
-                };
-            }
-            @foreach (var s in txScreens)
-            {
-                <div class="col-md-6">
-                    <a href="@s.Url" class="text-decoration-none">
-                        <div class="card card-body py-2 px-3 d-flex flex-row align-items-center gap-3">
-                            <span class="badge @s.Badge screen-badge" style="min-width:26px;text-align:center">@s.Num</span>
-                            <div>
-                                <div class="fw-semibold small">@s.Title</div>
-                                <div class="text-muted" style="font-size:.75rem">@s.Desc</div>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-            }
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card border-info h-100">
+            <div class="card-body text-center">
+                <div class="display-6 fw-bold text-info">@Model.ClearinghouseQueueCount</div>
+                <div class="small text-muted mt-1">Clearinghouse Queue</div>
+            </div>
         </div>
-
-        <div class="text-center">
-            <a asp-page="/Presenter/Console" class="btn btn-outline-warning">Open Presenter Console</a>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card border-success h-100">
+            <div class="card-body text-center">
+                <div class="display-6 fw-bold text-success">@Model.TotalTransactionsCount</div>
+                <div class="small text-muted mt-1">Attachments Received</div>
+            </div>
         </div>
     </div>
 </div>
+
+@* ── Portal entry points ── *@
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card h-100 border-primary">
+            <div class="card-header bg-primary text-white py-2">
+                <strong>Payer Portal</strong>
+            </div>
+            <div class="card-body">
+                <p class="text-muted small mb-3">Review incoming attachments, create solicited requests, view pipeline results and audit trails.</p>
+                <div class="d-grid gap-2">
+                    <a href="/Payer/Dashboard" class="btn btn-primary">Payer Dashboard</a>
+                    <a href="/Payer/Requests/Create" class="btn btn-outline-primary">Create Attachment Request</a>
+                    <a href="/Payer/Requests/Index" class="btn btn-outline-secondary btn-sm">View All Requests</a>
+                    <a href="/Clearinghouse/Queue" class="btn btn-outline-secondary btn-sm">Clearinghouse Queue (@Model.ClearinghouseQueueCount pending)</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 border-success">
+            <div class="card-header bg-success text-white py-2">
+                <strong>Provider Portal</strong>
+            </div>
+            <div class="card-body">
+                <p class="text-muted small mb-3">Submit claim attachments directly or via the clearinghouse. Upload C-CDA documents or select from EMR records.</p>
+                <div class="d-grid gap-2">
+                    <a href="/Provider/DirectSubmit" class="btn btn-success">Direct Submission</a>
+                    <a href="/Clearinghouse/Submit" class="btn btn-outline-success">Submit via Clearinghouse</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 border-secondary">
+            <div class="card-header bg-secondary text-white py-2">
+                <strong>About This Platform</strong>
+            </div>
+            <div class="card-body">
+                <p class="text-muted small mb-2">CMS-0053-F compliant electronic claim attachment workflow. Three submission paths:</p>
+                <ul class="small text-muted mb-3">
+                    <li><strong>Solicited:</strong> Payer requests → provider uploads</li>
+                    <li><strong>Clearinghouse:</strong> Provider → Veridian Exchange → payer pulls</li>
+                    <li><strong>Direct:</strong> Provider submits directly via X12 275</li>
+                </ul>
+                <p class="small text-muted mb-0">All paths run the same 8-stage validation pipeline: X12 parse → CDA schema → C-CDA template → Schematron → LOINC → XMLDSig → claim match → audit hash.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* ── Recent activity ── *@
+@if (Model.RecentTransactions.Any())
+{
+    <h5 class="fw-semibold mb-2">Recent Activity</h5>
+    <div class="table-responsive">
+        <table class="table table-sm table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Tracking #</th>
+                    <th>Patient</th>
+                    <th>Provider</th>
+                    <th>Document Type</th>
+                    <th>Source</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var tx in Model.RecentTransactions)
+                {
+                    var statusClass = tx.Status == "Routed" ? "bg-success" :
+                                     tx.Status == "Failed"  ? "bg-danger"  : "bg-secondary";
+                    var sourceLabel = tx.SourceType switch
+                    {
+                        "Solicited"               => "Solicited",
+                        "UnsolicitedClearinghouse" => "Clearinghouse",
+                        _                          => "Direct"
+                    };
+                    <tr>
+                        <td class="font-monospace small">@tx.TrackingNumber</td>
+                        <td>@tx.PatientName</td>
+                        <td class="small text-muted">@tx.ProviderName</td>
+                        <td class="small">@tx.DocumentType</td>
+                        <td><span class="badge bg-secondary small">@sourceLabel</span></td>
+                        <td><span class="badge @statusClass small">@tx.Status</span></td>
+                        <td><a href="/Payer/Attachments/Detail/@tx.Id" class="btn btn-xs btn-outline-primary btn-sm py-0 px-2">View</a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

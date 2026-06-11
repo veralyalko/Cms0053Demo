@@ -1,0 +1,110 @@
+@page
+@model Cms0053Demo.Pages.Payer.DashboardModel
+@{ ViewData["Title"] = "Payer Dashboard"; }
+
+<div class="d-flex align-items-center gap-2 mb-1">
+    <span class="badge bg-primary">Payer Portal</span>
+</div>
+<h2 class="fw-bold mb-4">Attachment Dashboard</h2>
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+        <div class="card border-success h-100">
+            <div class="card-body text-center">
+                <div class="display-6 fw-bold text-success">@Model.RoutedCount</div>
+                <div class="small text-muted">Accepted & Routed</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card border-danger h-100">
+            <div class="card-body text-center">
+                <div class="display-6 fw-bold text-danger">@Model.FailedCount</div>
+                <div class="small text-muted">Validation Failed</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card border-warning h-100">
+            <div class="card-body text-center">
+                <div class="display-6 fw-bold text-warning">@Model.PendingRequestsCount</div>
+                <div class="small text-muted">Pending Requests</div>
+                <a href="/Payer/Requests/Index" class="btn btn-xs btn-outline-warning btn-sm py-0 mt-1">View</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card border-info h-100">
+            <div class="card-body text-center">
+                <div class="display-6 fw-bold text-info">@Model.ClearinghouseQueueCount</div>
+                <div class="small text-muted">Clearinghouse Queue</div>
+                <a href="/Clearinghouse/Queue" class="btn btn-xs btn-outline-info btn-sm py-0 mt-1">Pull</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <h5 class="fw-semibold mb-0">Incoming Attachments</h5>
+    <a href="/Payer/Requests/Create" class="btn btn-sm btn-primary">+ Create Attachment Request</a>
+</div>
+
+@if (!Model.Transactions.Any())
+{
+    <div class="card">
+        <div class="card-body text-center text-muted py-5">
+            No attachments received yet. Submit one via the Provider Portal or pull from the clearinghouse.
+        </div>
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Tracking #</th>
+                    <th>Patient</th>
+                    <th>Provider</th>
+                    <th>Document</th>
+                    <th>Source</th>
+                    <th>Submitted</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var tx in Model.Transactions)
+                {
+                    var statusClass = tx.Status == "Routed" ? "bg-success" :
+                                     tx.Status == "Failed"  ? "bg-danger"  : "bg-secondary";
+                    var sourceClass = tx.SourceType switch
+                    {
+                        "Solicited"               => "bg-primary",
+                        "UnsolicitedClearinghouse" => "bg-info text-dark",
+                        _                          => "bg-secondary"
+                    };
+                    var sourceLabel = tx.SourceType switch
+                    {
+                        "Solicited"               => "Solicited",
+                        "UnsolicitedClearinghouse" => "Clearinghouse",
+                        _                          => "Direct"
+                    };
+                    <tr>
+                        <td class="font-monospace small text-muted">@tx.TrackingNumber</td>
+                        <td>
+                            <div class="fw-semibold small">@tx.PatientName</div>
+                            <div class="text-muted" style="font-size:.7rem">DOB @tx.PatientDOB.ToString("MM/dd/yyyy")</div>
+                        </td>
+                        <td class="small">@tx.ProviderName<br/><span class="text-muted">@tx.ProviderNPI</span></td>
+                        <td class="small">@tx.DocumentType<br/><span class="font-monospace text-muted" style="font-size:.7rem">@tx.LoincCode</span></td>
+                        <td><span class="badge @sourceClass small">@sourceLabel</span></td>
+                        <td class="small text-muted">@tx.SubmittedAt.ToString("MM/dd HH:mm")</td>
+                        <td><span class="badge @statusClass small">@tx.Status</span></td>
+                        <td><a href="/Payer/Attachments/Detail/@tx.Id" class="btn btn-sm btn-outline-primary py-0 px-2">Detail</a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

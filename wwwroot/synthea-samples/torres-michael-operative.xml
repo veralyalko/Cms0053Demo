@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Synthea-generated CDA R2 / C-CDA R2.1 Operative Note -->
+<!-- Patient: Michael Torres | Metro Gastro Associates | NPI: 3331234567 -->
+<ClinicalDocument xmlns="urn:hl7-org:v3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <typeId root="2.16.840.1.113883.1.3" extension="POCD_HD000040"/>
+  <templateId root="2.16.840.1.113883.10.20.22.1.1"/>
+  <templateId root="2.16.840.1.113883.10.20.22.1.7"/>
+  <id root="2.16.840.1.113883.19" extension="CLM-E-2026-0203-CDA"/>
+  <code code="11504-8" codeSystem="2.16.840.1.113883.6.1" displayName="Surgical operation note"/>
+  <title>Operative Note — Michael Torres</title>
+  <effectiveTime value="20260510"/>
+  <confidentialityCode code="N" codeSystem="2.16.840.1.113883.5.25"/>
+  <recordTarget>
+    <patientRole>
+      <id root="2.16.840.1.113883.19" extension="MHP-E-000203"/>
+      <addr use="HP">
+        <streetAddressLine>2230 Westfield Avenue</streetAddressLine>
+        <city>Columbus</city>
+        <state>OH</state>
+        <postalCode>43214</postalCode>
+      </addr>
+      <telecom use="HP" value="tel:+16145550531"/>
+      <patient>
+        <name use="L">
+          <given>Michael</given>
+          <family>Torres</family>
+        </name>
+        <administrativeGenderCode code="M" codeSystem="2.16.840.1.113883.5.1"/>
+        <birthTime value="19620418"/>
+        <raceCode code="2054-5" codeSystem="2.16.840.1.113883.6.238" displayName="Black or African American"/>
+        <ethnicGroupCode code="2135-2" codeSystem="2.16.840.1.113883.6.238" displayName="Hispanic or Latino"/>
+      </patient>
+    </patientRole>
+  </recordTarget>
+  <author>
+    <time value="20260510"/>
+    <assignedAuthor>
+      <id root="2.16.840.1.113883.4.6" extension="3331234567"/>
+      <assignedPerson>
+        <name>
+          <prefix>Dr.</prefix>
+          <given>David</given>
+          <family>Kim</family>
+          <suffix>MD</suffix>
+        </name>
+      </assignedPerson>
+      <representedOrganization>
+        <name>Metro Gastro Associates</name>
+      </representedOrganization>
+    </assignedAuthor>
+  </author>
+  <custodian>
+    <assignedCustodian>
+      <representedCustodianOrganization>
+        <id root="2.16.840.1.113883.4.6" extension="3331234567"/>
+        <name>Metro Gastro Associates</name>
+        <telecom use="WP" value="tel:+16145550500"/>
+        <addr>
+          <streetAddressLine>750 Olentangy River Road</streetAddressLine>
+          <city>Columbus</city>
+          <state>OH</state>
+          <postalCode>43214</postalCode>
+        </addr>
+      </representedCustodianOrganization>
+    </assignedCustodian>
+  </custodian>
+  <component>
+    <structuredBody>
+      <!-- Procedure Indications (LOINC 29554-3) -->
+      <component>
+        <section>
+          <templateId root="2.16.840.1.113883.10.20.22.2.29"/>
+          <code code="29554-3" codeSystem="2.16.840.1.113883.6.1" displayName="Procedure Indications"/>
+          <title>Procedure Indications</title>
+          <text>63-year-old male presenting for routine average-risk colorectal cancer screening colonoscopy. Last colonoscopy 10 years ago showed no polyps. Family history positive for colon cancer in father (age 72). Patient has no current GI symptoms. Risk stratification indicates standard 10-year screening interval. Informed consent obtained. Patient completed standard bowel preparation with split-dose polyethylene glycol. Procedure performed in outpatient endoscopy suite.</text>
+        </section>
+      </component>
+      <!-- Procedure Description (LOINC 10219-4) -->
+      <component>
+        <section>
+          <templateId root="2.16.840.1.113883.10.20.22.2.29"/>
+          <code code="10219-4" codeSystem="2.16.840.1.113883.6.1" displayName="Procedure Description"/>
+          <title>Procedure Description</title>
+          <text>Patient was placed in left lateral decubitus position. Moderate sedation administered with midazolam 2 mg IV and fentanyl 100 mcg IV by the endoscopy nurse under physician supervision. A Olympus CF-HQ190L colonoscope was introduced per rectum and advanced under direct visualization to the cecum. Cecal intubation confirmed by identification of the ileocecal valve and appendiceal orifice. Cecal withdrawal time 8 minutes. Bowel preparation quality: Good (Boston Bowel Preparation Scale 7/9). Findings: Two small sessile polyps identified in the sigmoid colon, each measuring approximately 4 mm. Both polyps removed via cold snare polypectomy. Specimens submitted to pathology. No active bleeding post-polypectomy. No other mucosal abnormalities identified. Procedure completed without complications. Patient tolerated procedure well and was discharged to recovery in stable condition.</text>
+        </section>
+      </component>
+    </structuredBody>
+  </component>
+</ClinicalDocument>

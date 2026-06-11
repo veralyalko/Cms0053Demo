@@ -1,61 +1,144 @@
 using Cms0053Demo.Models;
+using Microsoft.AspNetCore.Hosting;
 
 namespace Cms0053Demo.Data;
 
 public static class SeedData
 {
-    public static void Initialize(AppDbContext db)
+    public static void Initialize(AppDbContext db, IWebHostEnvironment env)
     {
-        if (db.DemoScenarios.Any()) return;
+        if (db.Claims.Any()) return;
 
-        db.DemoScenarios.AddRange(
-            new DemoScenario
+        // ── Claims (payer's existing open claims awaiting attachments) ───────────
+        db.Claims.AddRange(
+            new Claim
             {
-                Code          = "A",
-                Title         = "Cardiac Inpatient — Happy Path",
-                Description   = "Discharge summary for a cardiac inpatient admission. All validation stages pass. Demonstrates the full happy-path lifecycle from X12 receipt to claim adjudication in under 4 hours.",
-                PatientName   = "Harold Whitfield",
-                PatientDOB    = new DateOnly(1948, 3, 22),
-                ProviderNPI   = "1234567890",
-                ProviderName  = "Lakewood Medical Center",
-                ClaimNumber   = "CLM-A-2026-0047",
-                ClaimAmount   = 18400.00m,
-                DocumentType  = "Discharge Summary",
-                LoincCode     = "18842-5",
-                ScenarioType  = "HappyPath",
-                ClinicianName = "Dr. Eleanor Marsh, MD"
+                ClaimNumber          = "CLM-A-2026-0047",
+                PatientName          = "James Harrison",
+                PatientDOB           = new DateOnly(1948, 3, 22),
+                ProviderNPI          = "1234567890",
+                ProviderName         = "Lakewood Medical Center",
+                ServiceDate          = new DateOnly(2026, 4, 15),
+                DiagnosisCode        = "I21.19",
+                DiagnosisDescription = "Inferior ST-elevation myocardial infarction",
+                AmountBilled         = 48_250.00m,
+                Status               = ClaimStatus.Open,
             },
-            new DemoScenario
+            new Claim
             {
-                Code          = "B",
-                Title         = "Obstetric Outpatient — Failure & Recovery",
-                Description   = "Operative report for an obstetric procedure. The submitted C-CDA document is missing a required section. Pipeline fails at stage 3, the error is surfaced, a corrected document is resubmitted, and the claim recovers.",
-                PatientName   = "Sofia Reyes",
-                PatientDOB    = new DateOnly(1991, 7, 14),
-                ProviderNPI   = "9876543210",
-                ProviderName  = "Riverside Women's Health",
-                ClaimNumber   = "CLM-B-2026-0112",
-                ClaimAmount   = 4750.00m,
-                DocumentType  = "Surgical Operation Note",
-                LoincCode     = "11504-8",
-                ScenarioType  = "DeliberateFailure",
-                ClinicianName = "Dr. Carmen Reyes, MD"
+                ClaimNumber          = "CLM-B-2026-0112",
+                PatientName          = "Sofia Reyes",
+                PatientDOB           = new DateOnly(1991, 7, 14),
+                ProviderNPI          = "9876543210",
+                ProviderName         = "Riverside Women's Health",
+                ServiceDate          = new DateOnly(2026, 3, 22),
+                DiagnosisCode        = "O82",
+                DiagnosisDescription = "Encounter for cesarean delivery without indication",
+                AmountBilled         = 4_750.00m,
+                Status               = ClaimStatus.Open,
             },
-            new DemoScenario
+            new Claim
             {
-                Code          = "C",
-                Title         = "Orthopedic — UM Prior Auth Review",
-                Description   = "History and physical for an orthopedic procedure requiring prior authorization. All validation stages pass. Attachment routes to the UM vendor for authorization review before claim adjudication.",
-                PatientName   = "Douglas Park",
-                PatientDOB    = new DateOnly(1965, 11, 9),
-                ProviderNPI   = "5551234567",
-                ProviderName  = "Summit Orthopedic Group",
-                ClaimNumber   = "CLM-C-2026-0088",
-                ClaimAmount   = 31200.00m,
-                DocumentType  = "History and Physical Note",
-                LoincCode     = "34117-2",
-                ScenarioType  = "UmReview",
-                ClinicianName = "Dr. Thomas Hale, MD"
+                ClaimNumber          = "CLM-C-2026-0088",
+                PatientName          = "Douglas Park",
+                PatientDOB           = new DateOnly(1965, 11, 9),
+                ProviderNPI          = "5551234567",
+                ProviderName         = "Summit Orthopedic Group",
+                ServiceDate          = new DateOnly(2026, 5, 1),
+                DiagnosisCode        = "M17.11",
+                DiagnosisDescription = "Primary osteoarthritis, right knee",
+                AmountBilled         = 32_800.00m,
+                Status               = ClaimStatus.Open,
+            },
+            new Claim
+            {
+                ClaimNumber          = "CLM-D-2026-0155",
+                PatientName          = "Patricia Williams",
+                PatientDOB           = new DateOnly(1945, 9, 30),
+                ProviderNPI          = "4441234567",
+                ProviderName         = "Valley General Hospital",
+                ServiceDate          = new DateOnly(2026, 4, 28),
+                DiagnosisCode        = "J18.9",
+                DiagnosisDescription = "Pneumonia, unspecified organism",
+                AmountBilled         = 18_500.00m,
+                Status               = ClaimStatus.Open,
+            },
+            new Claim
+            {
+                ClaimNumber          = "CLM-E-2026-0203",
+                PatientName          = "Michael Torres",
+                PatientDOB           = new DateOnly(1962, 4, 18),
+                ProviderNPI          = "3331234567",
+                ProviderName         = "Metro Gastro Associates",
+                ServiceDate          = new DateOnly(2026, 5, 10),
+                DiagnosisCode        = "Z12.11",
+                DiagnosisDescription = "Encounter for screening for malignant neoplasm of colon",
+                AmountBilled         = 3_200.00m,
+                Status               = ClaimStatus.Open,
+            }
+        );
+
+        // ── Synthea EMR Documents (Synthea-generated C-CDA files in wwwroot/synthea-samples/) ──
+        db.EmrDocuments.AddRange(
+            new EmrDocument
+            {
+                DocumentName = "Discharge Summary — James Harrison (04/15/2026)",
+                DocumentType = "Discharge Summary",
+                LoincCode    = "18842-5",
+                PatientName  = "James Harrison",
+                PatientDOB   = new DateOnly(1948, 3, 22),
+                ProviderNPI  = "1234567890",
+                ProviderName = "Lakewood Medical Center",
+                ServiceDate  = new DateOnly(2026, 4, 15),
+                FileName     = "harrison-james-discharge.xml",
+            },
+            new EmrDocument
+            {
+                DocumentName = "Operative Note — Sofia Reyes (03/22/2026)",
+                DocumentType = "Operative Note",
+                LoincCode    = "11504-8",
+                PatientName  = "Sofia Reyes",
+                PatientDOB   = new DateOnly(1991, 7, 14),
+                ProviderNPI  = "9876543210",
+                ProviderName = "Riverside Women's Health",
+                ServiceDate  = new DateOnly(2026, 3, 22),
+                FileName     = "reyes-sofia-operative.xml",
+            },
+            new EmrDocument
+            {
+                DocumentName = "History and Physical — Douglas Park (05/01/2026)",
+                DocumentType = "History and Physical Note",
+                LoincCode    = "34117-2",
+                PatientName  = "Douglas Park",
+                PatientDOB   = new DateOnly(1965, 11, 9),
+                ProviderNPI  = "5551234567",
+                ProviderName = "Summit Orthopedic Group",
+                ServiceDate  = new DateOnly(2026, 5, 1),
+                FileName     = "park-douglas-hp.xml",
+            },
+            new EmrDocument
+            {
+                DocumentName = "Discharge Summary — Patricia Williams (04/28/2026)",
+                DocumentType = "Discharge Summary",
+                LoincCode    = "18842-5",
+                PatientName  = "Patricia Williams",
+                PatientDOB   = new DateOnly(1945, 9, 30),
+                ProviderNPI  = "4441234567",
+                ProviderName = "Valley General Hospital",
+                ServiceDate  = new DateOnly(2026, 4, 28),
+                FileName     = "williams-patricia-discharge.xml",
+            },
+            new EmrDocument
+            {
+                DocumentName = "Operative Note — Michael Torres (05/10/2026)",
+                DocumentType = "Operative Note",
+                LoincCode    = "11504-8",
+                PatientName  = "Michael Torres",
+                PatientDOB   = new DateOnly(1962, 4, 18),
+                ProviderNPI  = "3331234567",
+                ProviderName = "Metro Gastro Associates",
+                ServiceDate  = new DateOnly(2026, 5, 10),
+                FileName     = "torres-michael-operative.xml",
             }
         );
 

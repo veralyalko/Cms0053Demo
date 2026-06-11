@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Synthea-generated CDA R2 / C-CDA R2.1 Discharge Summary -->
+<!-- Patient: James Harrison | Lakewood Medical Center | NPI: 1234567890 -->
+<ClinicalDocument xmlns="urn:hl7-org:v3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <typeId root="2.16.840.1.113883.1.3" extension="POCD_HD000040"/>
+  <templateId root="2.16.840.1.113883.10.20.22.1.1"/>
+  <templateId root="2.16.840.1.113883.10.20.22.1.8"/>
+  <id root="2.16.840.1.113883.19" extension="CLM-A-2026-0047-CDA"/>
+  <code code="18842-5" codeSystem="2.16.840.1.113883.6.1" displayName="Discharge Summary"/>
+  <title>Discharge Summary — James Harrison</title>
+  <effectiveTime value="20260415"/>
+  <confidentialityCode code="N" codeSystem="2.16.840.1.113883.5.25"/>
+  <recordTarget>
+    <patientRole>
+      <id root="2.16.840.1.113883.19" extension="MHP-A-000047"/>
+      <addr use="HP">
+        <streetAddressLine>412 Maple Street</streetAddressLine>
+        <city>Lakewood</city>
+        <state>OH</state>
+        <postalCode>44107</postalCode>
+      </addr>
+      <telecom use="HP" value="tel:+12165550147"/>
+      <patient>
+        <name use="L">
+          <given>James</given>
+          <family>Harrison</family>
+        </name>
+        <administrativeGenderCode code="M" codeSystem="2.16.840.1.113883.5.1"/>
+        <birthTime value="19480322"/>
+        <raceCode code="2106-3" codeSystem="2.16.840.1.113883.6.238" displayName="White"/>
+        <ethnicGroupCode code="2186-5" codeSystem="2.16.840.1.113883.6.238" displayName="Not Hispanic or Latino"/>
+      </patient>
+    </patientRole>
+  </recordTarget>
+  <author>
+    <time value="20260415"/>
+    <assignedAuthor>
+      <id root="2.16.840.1.113883.4.6" extension="1234567890"/>
+      <assignedPerson>
+        <name>
+          <prefix>Dr.</prefix>
+          <given>Eleanor</given>
+          <family>Marsh</family>
+          <suffix>MD</suffix>
+        </name>
+      </assignedPerson>
+      <representedOrganization>
+        <name>Lakewood Medical Center</name>
+      </representedOrganization>
+    </assignedAuthor>
+  </author>
+  <custodian>
+    <assignedCustodian>
+      <representedCustodianOrganization>
+        <id root="2.16.840.1.113883.4.6" extension="1234567890"/>
+        <name>Lakewood Medical Center</name>
+        <telecom use="WP" value="tel:+12165550100"/>
+        <addr>
+          <streetAddressLine>9500 Euclid Avenue</streetAddressLine>
+          <city>Lakewood</city>
+          <state>OH</state>
+          <postalCode>44107</postalCode>
+        </addr>
+      </representedCustodianOrganization>
+    </assignedCustodian>
+  </custodian>
+  <component>
+    <structuredBody>
+      <!-- Chief Complaint (LOINC 10154-3) -->
+      <component>
+        <section>
+          <templateId root="2.16.840.1.113883.10.20.22.2.13"/>
+          <code code="10154-3" codeSystem="2.16.840.1.113883.6.1" displayName="Chief Complaint"/>
+          <title>Chief Complaint</title>
+          <text>Patient presented with acute chest pain radiating to the left arm, diaphoresis, and shortness of breath. Onset 2 hours prior to arrival. EKG on arrival showed ST-elevation in leads II, III, aVF consistent with inferior STEMI.</text>
+        </section>
+      </component>
+      <!-- Hospital Course (LOINC 8648-8) -->
+      <component>
+        <section>
+          <templateId root="2.16.840.1.113883.10.20.22.2.24"/>
+          <code code="8648-8" codeSystem="2.16.840.1.113883.6.1" displayName="Hospital Course"/>
+          <title>Hospital Course</title>
+          <text>Patient was taken emergently to the cardiac catheterization laboratory. Coronary angiography revealed a 100% occlusion of the right coronary artery. Successful primary PCI was performed with placement of a drug-eluting stent. Post-procedure troponin peaked at 48.2 ng/mL. Patient remained hemodynamically stable throughout. Echocardiogram on day 2 showed EF of 45% with inferior wall hypokinesis. Patient was ambulating without symptoms by day 3. Discharged on aspirin, clopidogrel, metoprolol, atorvastatin, and lisinopril.</text>
+        </section>
+      </component>
+      <!-- Discharge Diagnoses (LOINC 11535-2) -->
+      <component>
+        <section>
+          <templateId root="2.16.840.1.113883.10.20.22.2.24"/>
+          <code code="11535-2" codeSystem="2.16.840.1.113883.6.1" displayName="Discharge Diagnoses"/>
+          <title>Discharge Diagnoses</title>
+          <text>
+            1. Inferior ST-elevation myocardial infarction (I21.19) — primary
+            2. Coronary artery disease, native vessel (I25.10)
+            3. Hypertension (I10)
+            4. Type 2 diabetes mellitus (E11.9)
+          </text>
+        </section>
+      </component>
+      <!-- Discharge Medications (LOINC 75310-3) -->
+      <component>
+        <section>
+          <templateId root="2.16.840.1.113883.10.20.22.2.11.1"/>
+          <code code="75310-3" codeSystem="2.16.840.1.113883.6.1" displayName="Discharge Medications"/>
+          <title>Discharge Medications</title>
+          <text>
+            1. Aspirin 81 mg daily — indefinite
+            2. Clopidogrel 75 mg daily — 12 months minimum
+            3. Metoprolol succinate 50 mg daily
+            4. Atorvastatin 80 mg daily
+            5. Lisinopril 5 mg daily
+            6. Metformin 500 mg twice daily (held during hospitalization, resume at discharge)
+          </text>
+        </section>
+      </component>
+    </structuredBody>
+  </component>
+</ClinicalDocument>

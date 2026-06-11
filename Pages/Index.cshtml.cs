@@ -8,18 +8,23 @@ namespace Cms0053Demo.Pages;
 
 public class IndexModel(AppDbContext db) : PageModel
 {
-    public List<DemoScenario> Scenarios { get; set; } = [];
-    public int TransactionCount { get; set; }
+    public int OpenClaimsCount { get; set; }
+    public int PendingRequestsCount { get; set; }
+    public int ClearinghouseQueueCount { get; set; }
+    public int TotalTransactionsCount { get; set; }
+    public List<AttachmentTransaction> RecentTransactions { get; set; } = [];
 
     public async Task OnGetAsync()
     {
-        Scenarios = await db.DemoScenarios.OrderBy(s => s.Code).ToListAsync();
-        TransactionCount = await db.AttachmentTransactions.CountAsync();
-    }
+        OpenClaimsCount         = await db.Claims.CountAsync(c => c.Status == ClaimStatus.Open);
+        PendingRequestsCount    = await db.AttachmentRequests.CountAsync(r => r.Status == RequestStatus.Pending);
+        ClearinghouseQueueCount = await db.ClearinghouseRecords.CountAsync(c => c.Status == ClearinghouseStatus.New);
+        TotalTransactionsCount  = await db.AttachmentTransactions.CountAsync();
 
-    public IActionResult OnPost(int scenarioId)
-    {
-        return RedirectToPage("/Demo/Pipeline", new { scenarioId });
+        RecentTransactions = await db.AttachmentTransactions
+            .OrderByDescending(t => t.CreatedAt)
+            .Take(5)
+            .ToListAsync();
     }
 
     public async Task<IActionResult> OnPostResetAsync()
@@ -27,6 +32,12 @@ public class IndexModel(AppDbContext db) : PageModel
         await db.AuditEvents.ExecuteDeleteAsync();
         await db.ValidationStageResults.ExecuteDeleteAsync();
         await db.AttachmentTransactions.ExecuteDeleteAsync();
+        await db.ClearinghouseRecords.ExecuteDeleteAsync();
+        await db.AttachmentRequests.ExecuteDeleteAsync();
+        // Delete uploaded files
+        var uploadsDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+        if (Directory.Exists(uploadsDir))
+            foreach (var f in Directory.GetFiles(uploadsDir)) System.IO.File.Delete(f);
         return RedirectToPage();
     }
 }

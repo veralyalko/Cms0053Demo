@@ -1,0 +1,106 @@
+@page "/Provider/Upload/{token}"
+@model Cms0053Demo.Pages.Provider.UploadModel
+@{ ViewData["Title"] = "Fulfill Attachment Request"; var req = Model.Request!; var claim = Model.Claim!; }
+
+<div class="d-flex align-items-center gap-2 mb-1">
+    <span class="badge bg-success">Provider Portal</span>
+    <span class="text-muted small">/ Fulfill Attachment Request</span>
+</div>
+<h2 class="fw-bold mb-1">Fulfilling Attachment Request</h2>
+<p class="text-muted mb-4">
+    Meridian Health Plan has requested clinical documentation for a claim.
+    Upload the requested document to fulfill this request.
+    <span class="badge bg-light text-secondary border small ms-1">Solicited workflow</span>
+</p>
+
+@* ── Request context ── *@
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card border-warning h-100">
+            <div class="card-header py-2 bg-warning bg-opacity-10">
+                <strong>Payer Request</strong>
+            </div>
+            <div class="card-body small">
+                <div class="text-muted">Tracking #</div>
+                <div class="fw-semibold font-monospace">@req.TrackingNumber</div>
+                <div class="text-muted mt-2">Document Requested</div>
+                <div class="fw-semibold">@req.DocumentTypeRequested</div>
+                <div class="text-muted mt-2">Due Date</div>
+                <div class="fw-semibold @(req.DueDate < DateTime.UtcNow ? "text-danger" : "")">
+                    @req.DueDate.ToString("MM/dd/yyyy")
+                </div>
+                @if (!string.IsNullOrEmpty(req.RequestReason))
+                {
+                    <div class="text-muted mt-2">Reason</div>
+                    <div>@req.RequestReason</div>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-header py-2"><strong>Claim</strong></div>
+            <div class="card-body small">
+                <div class="fw-semibold">@claim.ClaimNumber</div>
+                <div class="text-muted mt-1">Patient: @claim.PatientName</div>
+                <div class="text-muted">DOB: @claim.PatientDOB.ToString("MM/dd/yyyy")</div>
+                <div class="text-muted">Service: @claim.ServiceDate.ToString("MM/dd/yyyy")</div>
+                <div class="text-muted">Diagnosis: @claim.DiagnosisCode</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-header py-2"><strong>Provider</strong></div>
+            <div class="card-body small">
+                <div class="fw-semibold">@claim.ProviderName</div>
+                <div class="text-muted">NPI: @claim.ProviderNPI</div>
+                <div class="text-muted mt-2">Amount Billed: @claim.AmountBilled.ToString("C0")</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* ── Upload form ── *@
+<form method="post" enctype="multipart/form-data">
+    <div class="card mb-3">
+        <div class="card-header py-2"><strong>Upload Document</strong></div>
+        <div class="card-body">
+            @if (Model.EmrDocuments.Any())
+            {
+                <div class="mb-3">
+                    <label class="form-label">Select from EMR Records</label>
+                    <select asp-for="EmrDocumentId" class="form-select">
+                        <option value="">-- Upload your own below --</option>
+                        @foreach (var doc in Model.EmrDocuments)
+                        {
+                            <option value="@doc.Id">@doc.DocumentName</option>
+                        }
+                    </select>
+                    <div class="form-text">Matching records for this provider found in your EMR system.</div>
+                </div>
+                <div class="text-center text-muted small my-2">— OR —</div>
+            }
+            <div class="mb-3">
+                <label class="form-label">Upload C-CDA XML</label>
+                <input asp-for="UploadedFile" type="file" class="form-control"
+                       accept=".xml,.cda,text/xml,application/xml" />
+            </div>
+            <div class="mb-0">
+                <label class="form-label">Notes <span class="text-muted">(optional)</span></label>
+                <textarea asp-for="Notes" class="form-control" rows="2"
+                          placeholder="Any notes for the payer reviewer"></textarea>
+            </div>
+        </div>
+    </div>
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger">
+            @foreach (var err in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            { <div>@err.ErrorMessage</div> }
+        </div>
+    }
+
+    <button type="submit" class="btn btn-success">Submit to Meridian Health Plan &rarr;</button>
+</form>

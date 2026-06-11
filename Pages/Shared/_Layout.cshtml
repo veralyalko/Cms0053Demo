@@ -11,35 +11,47 @@
         body { background-color: #f8f9fa; }
         .navbar-brand { font-weight: 700; letter-spacing: -.5px; }
         .navbar { border-bottom: 3px solid #0d6efd; }
-        .screen-badge { font-size: .65rem; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; }
-        .stage-row { transition: background .2s; }
-        .stage-row.running { background: #fff3cd; }
-        .stage-row.passed  { background: #d1e7dd; }
-        .stage-row.failed  { background: #f8d7da; }
         .hash-cell { font-family: monospace; font-size: .72rem; word-break: break-all; }
-        .pain-stat { font-size: 2.8rem; font-weight: 700; line-height: 1; }
-        .timeline-bar { height: 24px; border-radius: 4px; }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-sm navbar-dark bg-dark mb-0">
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-0">
         <div class="container-fluid px-4">
             <a class="navbar-brand" asp-page="/Index">
                 <span class="text-primary">iX</span>DataBridge
                 <span class="badge bg-primary ms-2 fw-normal" style="font-size:.65rem">CMS-0053</span>
             </a>
-            <div class="navbar-collapse collapse">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="nav">
                 <ul class="navbar-nav me-auto">
-                    <li class="nav-item"><a class="nav-link" asp-page="/Demo/TodaysReality">S1</a></li>
-                    <li class="nav-item"><a class="nav-link" asp-page="/Demo/Compliance">S2</a></li>
-                    <li class="nav-item"><a class="nav-link" asp-page="/Demo/TradingPartner">S3</a></li>
-                    <li class="nav-item"><a class="nav-link" asp-page="/Demo/Pipeline">S4</a></li>
-                    <li class="nav-item"><a class="nav-link" asp-page="/Demo/Repository">S5</a></li>
-                    <li class="nav-item"><a class="nav-link" asp-page="/Demo/ClaimsHandoff">S6</a></li>
-                    <li class="nav-item"><a class="nav-link" asp-page="/Demo/AuditTrail">S7</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                            Payer Portal
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark">
+                            <li><a class="dropdown-item" asp-page="/Payer/Dashboard">Dashboard</a></li>
+                            <li><a class="dropdown-item" asp-page="/Payer/Requests/Index">Attachment Requests</a></li>
+                            <li><a class="dropdown-item" asp-page="/Payer/Requests/Create">+ New Request</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" asp-page="/Clearinghouse/Queue">Clearinghouse Queue</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                            Provider Portal
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark">
+                            <li><a class="dropdown-item" asp-page="/Provider/DirectSubmit">Direct Submission</a></li>
+                            <li><a class="dropdown-item" asp-page="/Clearinghouse/Submit">Submit via Clearinghouse</a></li>
+                        </ul>
+                    </li>
                 </ul>
                 <ul class="navbar-nav">
-                    <li class="nav-item"><a class="nav-link text-warning fw-semibold" asp-page="/Presenter/Console">Presenter</a></li>
+                    <li class="nav-item">
+                        <a class="nav-link text-muted small" asp-page="/Index">Home</a>
+                    </li>
                 </ul>
             </div>
         </div>

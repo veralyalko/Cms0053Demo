@@ -1,0 +1,195 @@
+@page
+@model Cms0053Demo.Pages.Clearinghouse.SubmitModel
+@{ ViewData["Title"] = "Submit to Clearinghouse"; }
+
+<div class="d-flex align-items-center gap-2 mb-1">
+    <span class="badge bg-info text-dark">Clearinghouse</span>
+    <span class="text-muted small">Veridian Health Exchange</span>
+</div>
+<h2 class="fw-bold mb-1">Submit Attachment via Clearinghouse</h2>
+<p class="text-muted mb-4">
+    Submit a claim attachment to Veridian Health Exchange for routing to Meridian Health Plan.
+    The payer will pull and process this submission from their clearinghouse queue.
+    <span class="badge bg-light text-secondary border small ms-1">X12 275 unsolicited clearinghouse</span>
+</p>
+
+<form method="post" enctype="multipart/form-data">
+    <div class="row">
+        <div class="col-lg-7">
+            <div class="card mb-3">
+                <div class="card-header py-2"><strong>1. Provider &amp; Patient Information</strong></div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Claim Number</label>
+                            <input asp-for="ClaimNumber" class="form-control" list="claimList"
+                                   placeholder="CLM-A-2026-0047" required />
+                            <datalist id="claimList">
+                                @foreach (var c in Model.Claims)
+                                { <option value="@c.ClaimNumber">@c.PatientName</option> }
+                            </datalist>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Provider NPI</label>
+                            <input asp-for="ProviderNPI" class="form-control"
+                                   pattern="\d{10}" maxlength="10" required />
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Provider Name</label>
+                            <input asp-for="ProviderName" class="form-control" required />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Patient Name</label>
+                            <input asp-for="PatientName" class="form-control" required />
+                        </div>
+                        <div class="col-md-3 mb-0">
+                            <label class="form-label">Patient DOB</label>
+                            <input asp-for="PatientDOBString" type="date" class="form-control" required />
+                        </div>
+                        <div class="col-md-3 mb-0">
+                            <label class="form-label">Service Date</label>
+                            <input asp-for="ServiceDateString" type="date" class="form-control" required />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header py-2"><strong>2. Document Type</strong></div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-7 mb-3">
+                            <label class="form-label">Document Type</label>
+                            <select asp-for="DocumentType" class="form-select" required
+                                    onchange="syncLoinc(this)">
+                                <option value="">-- Select --</option>
+                                <option value="Discharge Summary" data-loinc="18842-5">Discharge Summary</option>
+                                <option value="Operative Note" data-loinc="11504-8">Operative Note</option>
+                                <option value="History and Physical Note" data-loinc="34117-2">History and Physical Note</option>
+                                <option value="Lab Results" data-loinc="26436-6">Lab Results</option>
+                                <option value="Radiology Report" data-loinc="18748-4">Radiology Report</option>
+                            </select>
+                        </div>
+                        <div class="col-md-5 mb-3">
+                            <label class="form-label">LOINC Code</label>
+                            <input asp-for="LoincCode" class="form-control font-monospace" required />
+                        </div>
+                    </div>
+                    <div>
+                        <label class="form-label">Notes</label>
+                        <textarea asp-for="Notes" class="form-control" rows="2"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header py-2"><strong>3. Clinical Document</strong></div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Select from EMR</label>
+                        <select asp-for="EmrDocumentId" class="form-select"
+                                onchange="autofillFromEmr(this)">
+                            <option value="">-- Upload below --</option>
+                            @foreach (var doc in Model.EmrDocuments)
+                            {
+                                <option value="@doc.Id"
+                                        data-patient="@doc.PatientName"
+                                        data-dob="@doc.PatientDOB.ToString("yyyy-MM-dd")"
+                                        data-npi="@doc.ProviderNPI"
+                                        data-provider="@doc.ProviderName"
+                                        data-service="@doc.ServiceDate.ToString("yyyy-MM-dd")"
+                                        data-doctype="@doc.DocumentType"
+                                        data-loinc="@doc.LoincCode">
+                                    @doc.DocumentName
+                                </option>
+                            }
+                        </select>
+                    </div>
+                    <div class="text-center text-muted small my-2">— OR —</div>
+                    <div>
+                        <label class="form-label">Upload C-CDA XML</label>
+                        <input asp-for="UploadedFile" type="file" class="form-control"
+                               accept=".xml,.cda,text/xml,application/xml" />
+                    </div>
+                </div>
+            </div>
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger">
+                    @foreach (var e in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    { <div>@e.ErrorMessage</div> }
+                </div>
+            }
+
+            <button type="submit" class="btn btn-info text-white">
+                Submit to Veridian Health Exchange &rarr;
+            </button>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card border-light mb-3">
+                <div class="card-header py-2 bg-light"><strong>Open Claims</strong></div>
+                <div class="card-body p-0">
+                    <table class="table table-sm mb-0">
+                        <thead class="table-light"><tr><th>Claim</th><th>Patient</th></tr></thead>
+                        <tbody>
+                            @foreach (var c in Model.Claims)
+                            {
+                                <tr style="cursor:pointer"
+                                    onclick="fillClaim('@c.ClaimNumber','@c.ProviderNPI','@c.ProviderName','@c.PatientName','@c.PatientDOB.ToString("yyyy-MM-dd")','@c.ServiceDate.ToString("yyyy-MM-dd")')">
+                                    <td class="small fw-semibold">@c.ClaimNumber</td>
+                                    <td class="small">@c.PatientName</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card border-light">
+                <div class="card-header py-2 bg-light"><strong>How clearinghouse works</strong></div>
+                <div class="card-body small text-muted">
+                    <ol class="ps-3 mb-0">
+                        <li class="mb-1">Provider submits here — record staged in Veridian Health Exchange queue with status "New".</li>
+                        <li class="mb-1">Payer logs in and pulls from the queue on the Clearinghouse Queue page.</li>
+                        <li>Each pulled record runs through the 8-stage validation pipeline automatically.</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+<script>
+function fillClaim(cn, npi, prov, pat, dob, svc) {
+    document.getElementById('ClaimNumber').value   = cn;
+    document.getElementById('ProviderNPI').value   = npi;
+    document.getElementById('ProviderName').value  = prov;
+    document.getElementById('PatientName').value   = pat;
+    document.getElementById('PatientDOBString').value  = dob;
+    document.getElementById('ServiceDateString').value = svc;
+}
+function autofillFromEmr(sel) {
+    if (!sel.value) return;
+    var o = sel.options[sel.selectedIndex];
+    document.getElementById('PatientName').value       = o.dataset.patient;
+    document.getElementById('PatientDOBString').value  = o.dataset.dob;
+    document.getElementById('ProviderNPI').value       = o.dataset.npi;
+    document.getElementById('ProviderName').value      = o.dataset.provider;
+    document.getElementById('ServiceDateString').value = o.dataset.service;
+    document.getElementById('DocumentType').value      = o.dataset.doctype;
+    document.getElementById('LoincCode').value         = o.dataset.loinc;
+    @foreach (var c in Model.Claims)
+    {
+        @:if (o.dataset.npi === '@c.ProviderNPI') document.getElementById('ClaimNumber').value = '@c.ClaimNumber';
+    }
+}
+function syncLoinc(sel) {
+    var o = sel.options[sel.selectedIndex];
+    if (o && o.dataset.loinc) document.getElementById('LoincCode').value = o.dataset.loinc;
+}
+</script>
+}
