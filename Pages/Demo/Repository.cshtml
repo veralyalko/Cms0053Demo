@@ -1,4 +1,185 @@
 @page
 @model Cms0053Demo.Pages.Demo.RepositoryModel
-@{ ViewData["Title"] = "Screen — Repository"; }
-<div class="alert alert-secondary mt-4"><strong>Coming soon:</strong> Repository screen.</div>
+@using Cms0053Demo.Models
+@{
+    ViewData["Title"] = "Document Repository";
+    var tx    = Model.Transaction;
+    var scen  = Model.Scenario;
+    var sig   = Model.SigResult;
+    var loinc = Model.LoincInfo;
+    var color = scen?.Code switch { "A" => "primary", "B" => "danger", "C" => "warning", _ => "secondary" };
+}
+
+<style>
+    .cda-terminal {
+        background: #1a1a2e; color: #c5e1a5;
+        font-family: 'Consolas','Courier New',monospace; font-size:.73rem; line-height:1.6;
+        border-radius: 0 0 6px 6px; overflow-x: auto;
+    }
+    .sig-chip { font-family: monospace; font-size:.7rem; word-break: break-all; }
+    .meta-label { font-size:.7rem; text-transform:uppercase; letter-spacing:.06em; color:#6c757d; font-weight:600; }
+</style>
+
+@if (tx is null)
+{
+    <div class="mt-5 text-center text-muted">
+        <p class="fs-5">No transaction loaded.</p>
+        <a href="/" class="btn btn-primary">Select a Scenario</a>
+    </div>
+}
+else
+{
+    @* ── Scenario header ── *@
+    <div class="card border-@color mb-3">
+        <div class="card-body py-2">
+            <div class="d-flex align-items-center flex-wrap gap-3">
+                <span class="badge bg-@color fs-6 px-3 py-2">Scenario @scen!.Code</span>
+                <div>
+                    <div class="fw-semibold">@scen.Title</div>
+                    <small class="text-muted">@tx.PatientName &nbsp;·&nbsp; @tx.ProviderName &nbsp;·&nbsp; @tx.ClaimNumber</small>
+                </div>
+                <div class="ms-auto text-end">
+                    <span class="badge bg-secondary">Stored</span>
+                    <div class="font-monospace text-muted mt-1" style="font-size:.7rem">@tx.TrackingNumber</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* ── Screen nav ── *@
+    <div class="d-flex align-items-center gap-2 mb-3 pb-3 border-bottom small">
+        <a href="/Demo/Pipeline?transactionId=@tx.Id" class="btn btn-sm btn-outline-secondary">← Screen 4: Validation Pipeline</a>
+        <span class="ms-auto text-muted">Screen <strong>5</strong> of 7 — Document Repository</span>
+        <a href="/Demo/ClaimsHandoff?transactionId=@tx.Id" class="btn btn-sm btn-outline-secondary">Screen 6: Claims Handoff →</a>
+    </div>
+
+    @* ── Top two-column ── *@
+    <div class="row g-3 mb-3">
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header py-2"><strong>Document Metadata</strong></div>
+                <div class="card-body py-3">
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <div class="meta-label">Document Type</div>
+                            <div class="small">@tx.DocumentType</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="meta-label">LOINC Code</div>
+                            <div class="font-monospace small">
+                                <span class="badge bg-dark">@tx.LoincCode</span>
+                                <span class="text-muted ms-1" style="font-size:.75rem">@loinc?.DisplayName</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="meta-label">Category</div>
+                            <div class="small">@loinc?.Category</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="meta-label">Component</div>
+                            <div class="small">@loinc?.Component</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="meta-label">Patient</div>
+                            <div class="small">@tx.PatientName &nbsp;·&nbsp; @tx.PatientDOB.ToString("yyyy-MM-dd")</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="meta-label">Clinician</div>
+                            <div class="small">@scen.ClinicianName</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="meta-label">Provider NPI</div>
+                            <div class="font-monospace small">@tx.ProviderNPI</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="meta-label">Submitted</div>
+                            <div class="small">@tx.SubmittedAt.ToString("yyyy-MM-dd HH:mm") UTC</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card h-100 @(sig?.Valid == true ? "border-success" : "border-danger")">
+                <div class="card-header py-2 d-flex align-items-center">
+                    <strong>XMLDSig Certificate</strong>
+                    @if (sig?.Valid == true)
+                    {
+                        <span class="badge bg-success ms-2">✓ Signature Valid</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger ms-2">✗ Signature Invalid</span>
+                    }
+                </div>
+                <div class="card-body py-3">
+                    <div class="row g-2">
+                        <div class="col-12">
+                            <div class="meta-label">Certificate Subject</div>
+                            <div class="sig-chip text-muted" style="font-size:.68rem">@sig?.CertSubject</div>
+                        </div>
+                        <div class="col-12">
+                            <div class="meta-label">Thumbprint (SHA-1)</div>
+                            <div class="sig-chip">@Model.CertThumbprintShort</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="meta-label">Algorithm</div>
+                            <div class="small">@Model.CertAlgorithm</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="meta-label">Valid Until</div>
+                            <div class="small">@Model.CertValidUntil</div>
+                        </div>
+                        <div class="col-12">
+                            <div class="meta-label">Signature Algorithm</div>
+                            <div class="sig-chip text-muted" style="font-size:.68rem">@sig?.SignatureAlgorithm</div>
+                        </div>
+                        <div class="col-12">
+                            <div class="meta-label">Signature Element</div>
+                            <div class="small">
+                                @if (sig?.SignaturePresent == true)
+                                {
+                                    <span class="text-success">✓ &lt;Signature&gt; element present in CDA document</span>
+                                }
+                                else
+                                {
+                                    <span class="text-danger">✗ No signature found</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* ── CDA document viewer ── *@
+    <div class="card mb-3">
+        <div class="card-header py-2 d-flex align-items-center">
+            <strong>CDA R2 Document</strong>
+            <span class="ms-2 badge bg-dark">Signed XML</span>
+            <span class="ms-auto text-muted small">@Model.CdaTotalLines lines &nbsp;·&nbsp; @tx.CdaDocument.Length chars stored in DB</span>
+            <button class="btn btn-sm btn-link text-decoration-none ms-3 py-0"
+                    data-bs-toggle="collapse" data-bs-target="#cda-full">Show full</button>
+        </div>
+        <div class="cda-terminal p-3" style="max-height:260px; overflow-y:auto">
+            <pre class="mb-0" style="white-space:pre-wrap">@Model.CdaPreview</pre>
+            @if (Model.CdaTotalLines > 35)
+            {
+                <div class="text-muted mt-1" style="font-size:.7rem">… @(Model.CdaTotalLines - 35) more lines (click "Show full" above)</div>
+            }
+        </div>
+        <div class="collapse" id="cda-full">
+            <div class="cda-terminal p-3 border-top" style="max-height:400px; overflow-y:auto">
+                <pre class="mb-0" style="white-space:pre-wrap">@tx.CdaDocument</pre>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-end">
+        <a href="/Demo/ClaimsHandoff?transactionId=@tx.Id" class="btn btn-primary">
+            Proceed to Claims Handoff →
+        </a>
+    </div>
+}
